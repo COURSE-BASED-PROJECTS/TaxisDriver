@@ -14,7 +14,7 @@ function Home() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.status}>Online</Text>
+                <Text style={styles.status}>Đang hoạt động</Text>
                 {/* Switch */}
                 <Switch
                     style={styles.switchButton}

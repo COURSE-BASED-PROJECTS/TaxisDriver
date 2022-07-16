@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     status: {
-        fontSize: 30,
+        fontSize: 28,
     },
     switchButton:{
         position: 'absolute',

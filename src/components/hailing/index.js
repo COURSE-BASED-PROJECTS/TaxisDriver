@@ -50,10 +50,10 @@ function HailingPopup() {
             <View style={styles.chooseOption}>
                 <TouchableOpacity style={[styles.button,{backgroundColor: '#fff',
             }]}>
-                    <Text style={styles.textButton}>Decline</Text>
+                    <Text style={styles.textButton}>Từ chối</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button}>
-                    <Text style={styles.textButton}>Accept</Text>
+                    <Text style={styles.textButton}>Chấp nhận</Text>
                 </TouchableOpacity>
             </View>
         </View>
