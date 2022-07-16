@@ -32,7 +32,8 @@ const styles = StyleSheet.create({
         elevation: 7
     },
     buttonTitle:{
-        fontSize: 18
+        fontSize: 18,
+        color: Colors.bg_primary
     }
 });
 
