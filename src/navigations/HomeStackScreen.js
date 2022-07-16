@@ -1,4 +1,4 @@
-import { NavigationContainer } from "@react-navigation/native";
+// import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Image, Text } from "react-native";
 import Colors from "../styles/Colors";
@@ -10,8 +10,8 @@ const Tab = createBottomTabNavigator();
 
 function HomeStackScreen() {
     return (
-        <NavigationContainer>
-            <Tab.Navigator>
+        // <NavigationContainer>
+            <Tab.Navigator initialRouteName="Home">
                 <Tab.Screen
                     name="Home"
                     component={Home}
@@ -136,7 +136,7 @@ function HomeStackScreen() {
                     }}
                 />
             </Tab.Navigator>
-        </NavigationContainer>
+        // </NavigationContainer>
     );
 }
 
