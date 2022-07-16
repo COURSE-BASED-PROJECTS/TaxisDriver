@@ -8,6 +8,7 @@ const fakeData = [{ history: 1 }, { history: 1 }, { history: 1 }];
 function History() {
     return (
         <SafeAreaView style={styles.container}>
+            <Text style={styles.title}>Chuyến xe</Text>
             <FlatList
                 style={{ width: "100%", marginTop: 10, height: "100%" }}
                 data={fakeData}
