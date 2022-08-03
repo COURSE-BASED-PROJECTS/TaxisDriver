@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
         flex: 8,
         resizeMode: "contain",
     },
-
     formContent: {
         flex: 3,
     },
