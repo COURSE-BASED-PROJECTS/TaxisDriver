@@ -4,20 +4,52 @@ import {
     View,
     KeyboardAvoidingView,
     ScrollView,
-    TouchableOpacity
+    TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./styles";
+
 import FormElement from "../../components/FormElement";
 
+import { useSelector, useDispatch } from "react-redux";
+import { accountSelector } from "../../store/selector";
+import {
+    setUsername,
+    setPassword,
+    setUserInfo,
+} from "../../store/reducer/accountSlice";
+
 function Login({ navigation }) {
-    const handleSubmit = () => {
-        // authentication
-        // navigation.navigate("HomeStack");
-        navigation.reset({
-            index: 0,
-            routes: [{ name: "HomeStackScreen" }],
-        });
+    const dispatch = useDispatch();
+    const { username, password } = useSelector(accountSelector);
+
+    const handleSubmit = async () => {
+        if (username !== "" && password !== "") {
+            axios
+                .post(loginAPI, {
+                    username,
+                    password,
+                })
+                .then(function (response) {
+                    const userInfo = response.data;
+
+                    if (userInfo !== null && response.status === 200) {
+                        console.log(userInfo);
+                        dispatch(setUserInfo(userInfo));
+
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: "HomeStackScreen" }],
+                        });
+                    }
+                })
+                .catch(function (error) {
+                    alert("Tên tài khoản hoặc mật khẩu sai");
+                    dispatch(setUsername(""));
+                    dispatch(setPassword(""));
+                    console.log(error);
+                });
+        }
     };
 
     return (
@@ -38,6 +70,7 @@ function Login({ navigation }) {
                     <FormElement
                         title={"Tên tài khoản / SĐT"}
                         placeholder={"Nhập tên tài khoản / SĐT"}
+                        text="_username_"
                     />
 
                     <FormElement
@@ -49,7 +82,10 @@ function Login({ navigation }) {
             </KeyboardAvoidingView>
 
             <View style={styles.button}>
-                <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+                <TouchableOpacity
+                    style={styles.buttonContainer}
+                    onPress={handleSubmit}
+                >
                     <Text style={styles.buttonTitle}>Đăng nhập</Text>
                 </TouchableOpacity>
             </View>
