@@ -4,7 +4,7 @@ import Login from "./src/screens/Login";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import store from "./src/store/store";
+import {store} from "./src/store/store";
 import { Provider } from "react-redux";
 
 const Stack = createNativeStackNavigator();

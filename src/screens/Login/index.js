@@ -19,6 +19,9 @@ import {
     setUserInfo,
 } from "../../store/reducer/accountSlice";
 
+import axios from "axios";
+import { loginAPI } from "../../service/api";
+
 function Login({ navigation }) {
     const dispatch = useDispatch();
     const { username, password } = useSelector(accountSelector);
