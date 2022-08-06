@@ -5,19 +5,44 @@ import styles from "./styles";
 
 import Info from "../../components/info";
 import HailingPopup from "../../components/hailing";
+import FinishHailing from "../../components/FinishHailing";
 
 import SockJS from "sockjs-client"; // Note this line
 import Stomp from "stompjs";
+import * as Location from "expo-location";
+import configTime from "../../config/configTimeInterval";
 
 let stompClient = null;
 
 function Home() {
     const [switchRidingMode, setSwitchRidingMode] = useState(false);
     const [intervalID, setIntervalID] = useState(null);
+    const [position, setPosition] = useState({});
+    const [mode, setMode] = useState("ready");
 
     const handleSwitch = () => {
         setSwitchRidingMode((state) => !state);
     };
+
+    useEffect(() => {
+        const getLocation = async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                console.log("Permission to access location was denied");
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            const pos = {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            };
+
+            setPosition(pos);
+        };
+
+        setIntervalID(getLocation, configTime.getGPS);
+    }, []);
 
     useEffect(() => {
         const socket = new SockJS("http://10.0.2.2:8080/ws");
@@ -34,16 +59,19 @@ function Home() {
         if (switchRidingMode === true) {
             const id = setInterval(() => {
                 // Tell your username to the server
-                stompClient.send(
-                    "/app/chat.sendMessage",
-                    {},
-                    JSON.stringify({
-                        sender: "huy",
-                        content: "2",
-                        type: "CHAT",
-                    })
-                );
-            }, 2000);
+
+                if (position?.latitude && position?.longitude) {
+                    stompClient.send(
+                        "/app/chat.sendMessage",
+                        {},
+                        JSON.stringify({
+                            sender: "huy",
+                            content: position?.latitude,
+                            type: "CHAT",
+                        })
+                    );
+                }
+            }, configTime.sendingGPS);
 
             setIntervalID(id);
         }
@@ -68,7 +96,9 @@ function Home() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.status}>Đang hoạt động</Text>
+                <Text style={styles.status}>
+                    {switchRidingMode ? "Đang hoạt động" : "Ngừng hoạt động"}
+                </Text>
                 {/* Switch */}
                 <Switch
                     style={styles.switchButton}
@@ -77,9 +107,10 @@ function Home() {
                 />
             </View>
             <View style={styles.contentMap}></View>
-            {/* <Info/> */}
 
-            <HailingPopup />
+            {mode === "ready" && (<Info/>)}
+            {mode === "running" && (<HailingPopup/>)}
+            {mode === "onFinish" && (<FinishHailing/>)}
         </SafeAreaView>
     );
 }

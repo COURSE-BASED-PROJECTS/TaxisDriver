@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import styles from "./styles";
 
-function HailingPopup() {
+function FinishHailing() {
     return (
         <View style={styles.hailingPopup}>
             <View style={styles.hailingPopupHeader}>
@@ -47,16 +47,12 @@ function HailingPopup() {
             </View>
 
             <View style={styles.chooseOption}>
-                <TouchableOpacity style={[styles.button,{backgroundColor: '#fff',
-            }]}>
-                    <Text style={styles.textButton}>Từ chối</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.button}>
-                    <Text style={styles.textButton}>Chấp nhận</Text>
+                    <Text style={styles.textButton}>Hoàn thành chuyến đi</Text>
                 </TouchableOpacity>
             </View>
         </View>
     );
 }
 
-export default HailingPopup;
+export default FinishHailing;
