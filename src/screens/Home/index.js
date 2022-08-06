@@ -18,7 +18,7 @@ function Home() {
     const [switchRidingMode, setSwitchRidingMode] = useState(false);
     const [intervalID, setIntervalID] = useState(null);
     const [position, setPosition] = useState({});
-    const [mode, setMode] = useState("ready");
+    const [mode, setMode] = useState("running");
 
     const handleSwitch = () => {
         setSwitchRidingMode((state) => !state);
@@ -62,12 +62,14 @@ function Home() {
 
                 if (position?.latitude && position?.longitude) {
                     stompClient.send(
-                        "/app/chat.sendMessage",
+                        "/app/gps.getGps",
                         {},
                         JSON.stringify({
-                            sender: "huy",
-                            content: position?.latitude,
-                            type: "CHAT",
+                            driverIdentification: "1234",
+                            driverID: "1",
+                            latitude: position.latitude,
+                            longitude: position.longitude,
+                            type: "GPS"
                         })
                     );
                 }
