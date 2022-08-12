@@ -1,7 +1,17 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import styles from "./styles";
 
-function FinishHailing() {
+function FinishHailing({ setMode, stompClient }) {
+    const handleFinishHailing = () => {
+        stompClient.send(
+            // stream send package
+            "",
+            //finish hailing package
+            {}
+        );
+        setMode("ready");
+    };
+
     return (
         <View style={styles.hailingPopup}>
             <View style={styles.hailingPopupHeader}>
@@ -47,7 +57,10 @@ function FinishHailing() {
             </View>
 
             <View style={styles.chooseOption}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={handleFinishHailing}
+                >
                     <Text style={styles.textButton}>Hoàn thành chuyến đi</Text>
                 </TouchableOpacity>
             </View>

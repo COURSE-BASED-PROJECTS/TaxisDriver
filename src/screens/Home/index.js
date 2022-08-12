@@ -12,13 +12,16 @@ import Stomp from "stompjs";
 import * as Location from "expo-location";
 import configTime from "../../config/configTimeInterval";
 
+import { socketServer } from "../../service/api";
+import { packageGPS } from "../../utils/packageSend";
+
 let stompClient = null;
 
 function Home() {
     const [switchRidingMode, setSwitchRidingMode] = useState(false);
     const [intervalID, setIntervalID] = useState(null);
     const [position, setPosition] = useState({});
-    const [mode, setMode] = useState("running");
+    const [mode, setMode] = useState("ready");
 
     const handleSwitch = () => {
         setSwitchRidingMode((state) => !state);
@@ -45,10 +48,16 @@ function Home() {
     }, []);
 
     useEffect(() => {
-        const socket = new SockJS("http://10.0.2.2:8080/ws");
+        const socket = new SockJS(socketServer);
         stompClient = Stomp.over(socket);
 
-        stompClient.connect({}, onConnected, onError);
+        stompClient.connect(
+            {},
+            () => {
+                onConnected(stompClient);
+            },
+            onError
+        );
 
         return () => stompClient && stompClient.disconnect();
     }, []);
@@ -64,13 +73,7 @@ function Home() {
                     stompClient.send(
                         "/app/gps.getGps",
                         {},
-                        JSON.stringify({
-                            driverIdentification: "1234",
-                            driverID: "1",
-                            latitude: position.latitude,
-                            longitude: position.longitude,
-                            type: "GPS"
-                        })
+                        packageGPS("1234", "45567", position, "GPS")
                     );
                 }
             }, configTime.sendingGPS);
@@ -92,6 +95,21 @@ function Home() {
     const onMessageReceived = (payload) => {
         console.log("onMessageReceived");
         const message = JSON.parse(payload.body);
+
+        if (message.type === "checkDistance") {
+            if (mode !== "ready") return;
+            else {
+                // send distance between client and taxis
+            }
+        }
+
+        if (message.type === "option") {
+            if (mode !== "ready") return;
+            else {
+                setMode("running");
+            }
+        }
+
         console.log(message);
     };
 
@@ -110,9 +128,13 @@ function Home() {
             </View>
             <View style={styles.contentMap}></View>
 
-            {mode === "ready" && (<Info/>)}
-            {mode === "running" && (<HailingPopup/>)}
-            {mode === "onFinish" && (<FinishHailing/>)}
+            {mode === "ready" && <Info />}
+            {mode === "option" && (
+                <HailingPopup setMod={setMode} stompClient={stompClient} />
+            )}
+            {mode === "onFinish" && (
+                <FinishHailing setMod={setMode} stompClient={stompClient} />
+            )}
         </SafeAreaView>
     );
 }

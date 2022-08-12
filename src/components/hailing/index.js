@@ -1,7 +1,27 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, BackHandler } from "react-native";
 import styles from "./styles";
 
-function HailingPopup() {
+function HailingPopup({ setMode, stompClient }) {
+    const handleDecline = () => {
+        stompClient.send(
+            // stream send package
+            "",
+            //decline package
+            {}
+        );
+        setMode("ready");
+    };
+
+    const handleAccept = () => {
+        stompClient.send(
+            // stream send package
+            "",
+            //accept package
+            {}
+        );
+        setMode("onFinish");
+    };
+
     return (
         <View style={styles.hailingPopup}>
             <View style={styles.hailingPopupHeader}>
@@ -47,11 +67,13 @@ function HailingPopup() {
             </View>
 
             <View style={styles.chooseOption}>
-                <TouchableOpacity style={[styles.button,{backgroundColor: '#fff',
-            }]}>
+                <TouchableOpacity
+                    style={[styles.button, { backgroundColor: "#fff" }]}
+                    onPress={handleDecline}
+                >
                     <Text style={styles.textButton}>Từ chối</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPres={handleAccept}>
                     <Text style={styles.textButton}>Chấp nhận</Text>
                 </TouchableOpacity>
             </View>
