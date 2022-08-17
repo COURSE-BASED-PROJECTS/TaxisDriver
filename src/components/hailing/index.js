@@ -1,24 +1,27 @@
 import { View, Text, Image, TouchableOpacity, BackHandler } from "react-native";
-import styles from "./styles";
+import { useSelector } from "react-redux";
+// import { useDispatch } from "react-redux";
+// import styles from "./styles";
+
+import { statusPackageSelector } from "../../store/selector";
 
 function HailingPopup({ setMode, stompClient }) {
+    // const dispatch = useDispatch();
+    const { packageHailing } = useSelector(statusPackageSelector);
+
     const handleDecline = () => {
-        stompClient.send(
-            // stream send package
-            "",
-            //decline package
-            {}
-        );
+        const packageResponse = packageHailing;
+        packageResponse.status = "decline";
+
+        stompClient.send("/broadcast.handleRequest", {}, packageResponse);
         setMode("ready");
     };
 
     const handleAccept = () => {
-        stompClient.send(
-            // stream send package
-            "",
-            //accept package
-            {}
-        );
+        const packageResponse = packageHailing;
+        packageResponse.status = "accept";
+
+        stompClient.send("/broadcast.handleRequest", {}, packageResponse);
         setMode("onFinish");
     };
 
@@ -31,13 +34,21 @@ function HailingPopup({ setMode, stompClient }) {
                         source={require("../../../assets/icons/ava.png")}
                     />
                     <View style={styles.hailingPopupContent}>
-                        <Text style={styles.name}>Nguyễn Đức Huy</Text>
+                        <Text style={styles.name}>
+                            {packageHailing?.idClient}
+                        </Text>
                         <Text style={styles.pay}>Tiền mặt</Text>
                     </View>
                 </View>
                 <View style={styles.priceHailingPopup}>
-                    <Text style={styles.price}>20,000đ</Text>
-                    <Text style={styles.direction}>2.3km</Text>
+                    <Text style={styles.price}>
+                        {packageHailing?.hailing?.cost}đ
+                    </Text>
+                    <Text style={styles.direction}>
+                        {Math.round(packageHailing?.hailing?.distance * 100) /
+                            100}
+                        km
+                    </Text>
                 </View>
             </View>
 
@@ -56,12 +67,16 @@ function HailingPopup({ setMode, stompClient }) {
                 <View style={styles.infoContent}>
                     <View style={styles.startInfo}>
                         <Text style={styles.title}>Điểm đón</Text>
-                        <Text style={styles.content}>123 Nguyễn Văn Cừ</Text>
+                        <Text style={styles.content}>
+                            {packageHailing?.hailing?.locationStart?.name}
+                        </Text>
                     </View>
                     <View style={styles.separator}></View>
                     <View style={styles.destinationInfo}>
                         <Text style={styles.title}>Điểm đến</Text>
-                        <Text style={styles.content}>456 Nguyễn Văn Cừ</Text>
+                        <Text style={styles.content}>
+                            {packageHailing?.hailing?.locationEnd?.name}
+                        </Text>
                     </View>
                 </View>
             </View>

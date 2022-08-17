@@ -1,14 +1,18 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import styles from "./styles";
 
+import { setPackageHailing } from "../../store/reducer/statusPackageSlice";
+
 function FinishHailing({ setMode, stompClient }) {
+    const dispatch = useDispatch();
+
     const handleFinishHailing = () => {
-        stompClient.send(
-            // stream send package
-            "",
-            //finish hailing package
-            {}
-        );
+        const packageResponse = packageHailing;
+        packageResponse.status = "end";
+
+        stompClient.send("/broadcast.handleRequest", {}, packageResponse);
+
+        dispatch(setPackageHailing(packageResponse));
         setMode("ready");
     };
 

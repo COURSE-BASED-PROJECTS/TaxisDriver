@@ -15,6 +15,8 @@ import configTime from "../../config/configTimeInterval";
 import { socketServer } from "../../service/api";
 import { packageGPS } from "../../utils/packageSend";
 
+import { setPackageHailing } from "../../store/reducer/statusPackageSlice";
+
 let stompClient = null;
 
 function Home() {
@@ -22,6 +24,8 @@ function Home() {
     const [intervalID, setIntervalID] = useState(null);
     const [position, setPosition] = useState({});
     const [mode, setMode] = useState("ready");
+
+    const dispatch = useDispatch();
 
     const handleSwitch = () => {
         setSwitchRidingMode((state) => !state);
@@ -86,31 +90,32 @@ function Home() {
         console.log("onConnected");
         // Subscribe to the Public Topic
         stompClient.subscribe("/topic/public", onMessageReceived);
+        stompClient.subscribe("/topic/", onMessageReceivedPrivate);
     };
 
     const onError = (error) => {
         console.log(error);
     };
 
+    const onMessageReceivedPrivate = (payload) => {
+        const message = JSON.parse(payload.body);
+
+        if (message.status === "waiting") {
+            if (mode === "ready") {
+                dispatch(setPackageHailing(message));
+                setMode("option");
+            } else {
+                const messResponse = message;
+                messResponse.status = "decline";
+
+                stompClient.send("/broadcast.handleRequest", {}, messResponse);
+            }
+        }
+    };
+
     const onMessageReceived = (payload) => {
         console.log("onMessageReceived");
         const message = JSON.parse(payload.body);
-
-        if (message.type === "checkDistance") {
-            if (mode !== "ready") return;
-            else {
-                // send distance between client and taxis
-            }
-        }
-
-        if (message.type === "option") {
-            if (mode !== "ready") return;
-            else {
-                setMode("running");
-            }
-        }
-
-        console.log(message);
     };
 
     return (
