@@ -3,17 +3,23 @@ import styles from "./styles";
 
 import { setPackageHailing } from "../../store/reducer/statusPackageSlice";
 
-function FinishHailing({ setMode, stompClient }) {
+import { setMode } from "../../store/reducer/statusDriverMode";
+import { useDispatch, useSelector } from "react-redux";
+import { statusPackageSelector } from "../../store/selector";
+
+function FinishHailing({ stompClient }) {
     const dispatch = useDispatch();
 
+    const { packageHailing } = useSelector(statusPackageSelector);
+
     const handleFinishHailing = () => {
-        const packageResponse = packageHailing;
-        packageResponse.status = "end";
-
-        stompClient.send("/broadcast.handleRequest", {}, packageResponse);
-
-        dispatch(setPackageHailing(packageResponse));
-        setMode("ready");
+        stompClient.send(
+            "/app/broadcast.handleRequest",
+            {},
+            JSON.stringify({ packageHailing, status: "end" })
+        );
+        dispatch(setPackageHailing({ packageHailing, status: "end" }));
+        dispatch(setMode("ready"));
     };
 
     return (
@@ -25,13 +31,22 @@ function FinishHailing({ setMode, stompClient }) {
                         source={require("../../../assets/icons/ava.png")}
                     />
                     <View style={styles.hailingPopupContent}>
-                        <Text style={styles.name}>Nguyễn Đức Huy</Text>
+                        <Text style={styles.name}>
+                            {packageHailing?.idClient}
+                        </Text>
                         <Text style={styles.pay}>Tiền mặt</Text>
                     </View>
                 </View>
                 <View style={styles.priceHailingPopup}>
-                    <Text style={styles.price}>20,000đ</Text>
-                    <Text style={styles.direction}>2.3km</Text>
+                    <Text style={styles.price}>
+                        {" "}
+                        {packageHailing?.hailing?.cost}đ
+                    </Text>
+                    <Text style={styles.direction}>
+                        {Math.round(packageHailing?.hailing?.distance * 100) /
+                            100}
+                        km
+                    </Text>
                 </View>
             </View>
 
@@ -50,12 +65,16 @@ function FinishHailing({ setMode, stompClient }) {
                 <View style={styles.infoContent}>
                     <View style={styles.startInfo}>
                         <Text style={styles.title}>Điểm đón</Text>
-                        <Text style={styles.content}>123 Nguyễn Văn Cừ</Text>
+                        <Text style={styles.content}>
+                            {packageHailing?.hailing?.locationStart?.name}
+                        </Text>
                     </View>
                     <View style={styles.separator}></View>
                     <View style={styles.destinationInfo}>
                         <Text style={styles.title}>Điểm đến</Text>
-                        <Text style={styles.content}>456 Nguyễn Văn Cừ</Text>
+                        <Text style={styles.content}>
+                            {packageHailing?.hailing?.locationEnd?.name}
+                        </Text>
                     </View>
                 </View>
             </View>

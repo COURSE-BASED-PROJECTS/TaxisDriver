@@ -15,7 +15,11 @@ import configTime from "../../config/configTimeInterval";
 import { socketServer } from "../../service/api";
 import { packageGPS } from "../../utils/packageSend";
 
+import { useDispatch, useSelector } from "react-redux";
+
 import { setPackageHailing } from "../../store/reducer/statusPackageSlice";
+import { setMode } from "../../store/reducer/statusDriverMode";
+import { statusDriverModeSelector } from "../../store/selector";
 
 let stompClient = null;
 
@@ -23,8 +27,8 @@ function Home() {
     const [switchRidingMode, setSwitchRidingMode] = useState(false);
     const [intervalID, setIntervalID] = useState(null);
     const [position, setPosition] = useState({});
-    const [mode, setMode] = useState("ready");
 
+    const { mode } = useSelector(statusDriverModeSelector);
     const dispatch = useDispatch();
 
     const handleSwitch = () => {
@@ -55,13 +59,7 @@ function Home() {
         const socket = new SockJS(socketServer);
         stompClient = Stomp.over(socket);
 
-        stompClient.connect(
-            {},
-            () => {
-                onConnected(stompClient);
-            },
-            onError
-        );
+        stompClient.connect({}, onConnected, onError);
 
         return () => stompClient && stompClient.disconnect();
     }, []);
@@ -90,7 +88,42 @@ function Home() {
         console.log("onConnected");
         // Subscribe to the Public Topic
         stompClient.subscribe("/topic/public", onMessageReceived);
-        stompClient.subscribe("/topic/", onMessageReceivedPrivate);
+        stompClient.subscribe("/topic/123", onMessageReceivedPrivate);
+
+        const packageHailing = {
+            idHailing: "123",
+            idDriver: "driver",
+            idClient: "client",
+            hailing: {
+                locationStart: {
+                    latitude: 0,
+                    longitude: 0,
+                    name: "start",
+                },
+                locationEnd: {
+                    latitude: 0,
+                    longitude: 0,
+                    name: "end",
+                },
+                distance: 0,
+                carType: 2,
+                cost: 23000,
+                timeDuring: 0,
+                timeStart: new Date(
+                    Date.now() - new Date().getTimezoneOffset() * 60000
+                )
+                    .toISOString()
+                    .slice(0, -1),
+            },
+            status: "",
+            scope: [],
+        };
+
+        stompClient.send(
+            "/app/order.getOrder",
+            {},
+            JSON.stringify(packageHailing)
+        );
     };
 
     const onError = (error) => {
@@ -101,14 +134,23 @@ function Home() {
         const message = JSON.parse(payload.body);
 
         if (message.status === "waiting") {
+            if (!switchRidingMode) {
+                stompClient.send(
+                    "/app/broadcast.handleRequest",
+                    {},
+                    JSON.stringify({ ...message, status: "decline" })
+                );
+                return;
+            }
             if (mode === "ready") {
                 dispatch(setPackageHailing(message));
-                setMode("option");
+                dispatch(setMode("option"));
             } else {
-                const messResponse = message;
-                messResponse.status = "decline";
-
-                stompClient.send("/broadcast.handleRequest", {}, messResponse);
+                stompClient.send(
+                    "/app/broadcast.handleRequest",
+                    {},
+                    JSON.stringify({ ...message, status: "decline" })
+                );
             }
         }
     };
@@ -134,12 +176,8 @@ function Home() {
             <View style={styles.contentMap}></View>
 
             {mode === "ready" && <Info />}
-            {mode === "option" && (
-                <HailingPopup setMod={setMode} stompClient={stompClient} />
-            )}
-            {mode === "onFinish" && (
-                <FinishHailing setMod={setMode} stompClient={stompClient} />
-            )}
+            {mode === "option" && <HailingPopup stompClient={stompClient} />}
+            {mode === "onFinish" && <FinishHailing stompClient={stompClient} />}
         </SafeAreaView>
     );
 }

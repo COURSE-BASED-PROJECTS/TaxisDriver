@@ -1,6 +1,9 @@
 import { View, Text, Image } from "react-native";
 import styles from "./styles";
 
+import { accountSelector } from "../../store/selector";
+import { useSelector } from "react-redux";
+
 const ratingHistory = [
     {
         image: require("../../../assets/icons/check-mark.png"),
@@ -20,6 +23,8 @@ const ratingHistory = [
 ];
 
 function Info() {
+    const { userInfo } = useSelector(accountSelector);
+
     return (
         <View style={styles.info}>
             <View style={styles.infoHeader}>
@@ -29,13 +34,23 @@ function Info() {
                         source={require("../../../assets/icons/ava.png")}
                     />
                     <View style={styles.infoContent}>
-                        <Text style={styles.name}>Nguyễn Đức Huy</Text>
-                        <Text style={styles.level}>Hạng bạc</Text>
+                        <Text style={styles.name}>{userInfo?.name}</Text>
+                        <Text style={styles.level}>
+                            {userInfo?.ride_count ?? 0 < 100
+                                ? "Hạng đồng"
+                                : userInfo?.ride_count ?? 0 > 500
+                                ? "Hạng kim cương"
+                                : "Hạng bạc"}
+                        </Text>
                     </View>
                 </View>
                 <View style={styles.balanceInfo}>
                     <Text style={styles.balanceTitle}>Thu nhập</Text>
-                    <Text style={styles.balance}>100,000,000đ</Text>
+                    <Text style={styles.balance}>
+                        {(userInfo?.balance ?? 0)
+                            .toFixed(2)
+                            .replace(/\d(?=(\d{3})+\.)/g, "$&,") + "đ"}
+                    </Text>
                 </View>
             </View>
             <View style={styles.infoRiding}>

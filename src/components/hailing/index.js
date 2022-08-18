@@ -1,28 +1,30 @@
 import { View, Text, Image, TouchableOpacity, BackHandler } from "react-native";
-import { useSelector } from "react-redux";
-// import { useDispatch } from "react-redux";
-// import styles from "./styles";
+import styles from "./styles";
 
 import { statusPackageSelector } from "../../store/selector";
+import { setMode } from "../../store/reducer/statusDriverMode";
+import { useDispatch, useSelector } from "react-redux";
 
-function HailingPopup({ setMode, stompClient }) {
-    // const dispatch = useDispatch();
+function HailingPopup({ stompClient }) {
+    const dispatch = useDispatch();
     const { packageHailing } = useSelector(statusPackageSelector);
 
     const handleDecline = () => {
-        const packageResponse = packageHailing;
-        packageResponse.status = "decline";
-
-        stompClient.send("/broadcast.handleRequest", {}, packageResponse);
-        setMode("ready");
+        stompClient.send(
+            "/app/broadcast.handleRequest",
+            {},
+            JSON.stringify({ packageHailing, status: "decline" })
+        );
+        dispatch(setMode("ready"));
     };
 
     const handleAccept = () => {
-        const packageResponse = packageHailing;
-        packageResponse.status = "accept";
-
-        stompClient.send("/broadcast.handleRequest", {}, packageResponse);
-        setMode("onFinish");
+        stompClient.send(
+            "/app/broadcast.handleRequest",
+            {},
+            JSON.stringify({ packageHailing, status: "accept" })
+        );
+        dispatch(setMode("onFinish"));
     };
 
     return (
@@ -82,14 +84,14 @@ function HailingPopup({ setMode, stompClient }) {
             </View>
 
             <View style={styles.chooseOption}>
+                <TouchableOpacity style={styles.button} onPress={handleAccept}>
+                    <Text style={styles.textButton}>Chấp nhận</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.button, { backgroundColor: "#fff" }]}
                     onPress={handleDecline}
                 >
                     <Text style={styles.textButton}>Từ chối</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPres={handleAccept}>
-                    <Text style={styles.textButton}>Chấp nhận</Text>
                 </TouchableOpacity>
             </View>
         </View>

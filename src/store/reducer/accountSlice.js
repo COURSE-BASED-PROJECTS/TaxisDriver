@@ -17,7 +17,7 @@ export const accountSlice = createSlice({
             state.password = action.payload;
         },
         setUserInfo: (state, action) => {
-            state.userInfo = action.payload;
+            state.userInfo = { ...state.userInfo, ...action.payload };
         },
     },
 });

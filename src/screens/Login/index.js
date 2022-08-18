@@ -20,43 +20,55 @@ import {
 } from "../../store/reducer/accountSlice";
 
 import axios from "axios";
-import { loginAPI } from "../../service/api";
+import { loginAPI, driverInfo } from "../../service/api";
 
 function Login({ navigation }) {
     const dispatch = useDispatch();
     const { username, password } = useSelector(accountSelector);
 
     const handleSubmit = async () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: "HomeStackScreen" }],
-        });
-        // if (username !== "" && password !== "") {
-        //     axios
-        //         .post(loginAPI, {
-        //             username,
-        //             password,
-        //         })
-        //         .then(function (response) {
-        //             const userInfo = response.data;
+        if (username !== "" && password !== "") {
+            axios
+                .post(loginAPI, {
+                    username,
+                    password,
+                })
+                .then(function (response) {
+                    const userInfo = response.data;
 
-        //             if (userInfo !== null && response.status === 200) {
-        //                 console.log(userInfo);
-        //                 dispatch(setUserInfo(userInfo));
+                    if (userInfo !== null && response.status === 200) {
+                        console.log(userInfo);
+                        axios
+                            .get(driverInfo + userInfo.phonenumber)
+                            .then(function (res) {
+                                const driverInfo = res.data;
+                                // handle success
+                                if (userInfo !== null && res.status === 200) {
+                                    dispatch(setUserInfo(driverInfo));
+                                }
+                            })
+                            .catch(function (error) {
+                                // handle error
+                                console.log(error);
+                            })
+                            .then(function () {
+                                // always executed
+                            });
+                        dispatch(setUserInfo(userInfo));
 
-        //                 navigation.reset({
-        //                     index: 0,
-        //                     routes: [{ name: "HomeStackScreen" }],
-        //                 });
-        //             }
-        //         })
-        //         .catch(function (error) {
-        //             alert("Tên tài khoản hoặc mật khẩu sai");
-        //             dispatch(setUsername(""));
-        //             dispatch(setPassword(""));
-        //             console.log(error);
-        //         });
-        // }
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: "HomeStackScreen" }],
+                        });
+                    }
+                })
+                .catch(function (error) {
+                    alert("Tên tài khoản hoặc mật khẩu sai");
+                    dispatch(setUsername(""));
+                    dispatch(setPassword(""));
+                    console.log(error);
+                });
+        }
     };
 
     return (
