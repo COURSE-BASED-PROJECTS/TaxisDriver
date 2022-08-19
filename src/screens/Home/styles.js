@@ -26,10 +26,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 0,
         right: 0,
-        top: Dimensions.get('window').height*0.2,
+        top: Dimensions.get('window').height*0.15,
         bottom: 0,
         backgroundColor: Colors.secondary_light
     },
+    currentMapView: {
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+    }
     
 })
 
