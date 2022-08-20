@@ -10,6 +10,8 @@ import FinishHailing from "../../components/FinishHailing";
 import MapView, { Marker } from "react-native-maps";
 // import MapViewDirections from "react-native-maps-directions";
 
+import uuid from "react-native-uuid";
+
 import SockJS from "sockjs-client"; // Note this line
 import Stomp from "stompjs";
 import * as Location from "expo-location";
@@ -95,41 +97,9 @@ function Home() {
         console.log("onConnected");
         // Subscribe to the Public Topic
         stompClient.subscribe("/topic/public", onMessageReceived);
-        stompClient.subscribe("/topic/123", onMessageReceivedPrivate);
-
-        const packageHailing = {
-            idHailing: "123",
-            idDriver: "driver",
-            idClient: "client",
-            hailing: {
-                locationStart: {
-                    latitude: 0,
-                    longitude: 0,
-                    name: "start",
-                },
-                locationEnd: {
-                    latitude: 0,
-                    longitude: 0,
-                    name: "end",
-                },
-                distance: 0,
-                carType: 2,
-                cost: 23000,
-                timeDuring: 0,
-                timeStart: new Date(
-                    Date.now() - new Date().getTimezoneOffset() * 60000
-                )
-                    .toISOString()
-                    .slice(0, -1),
-            },
-            status: "",
-            scope: [],
-        };
-
-        stompClient.send(
-            "/app/order.getOrder",
-            {},
-            JSON.stringify(packageHailing)
+        stompClient.subscribe(
+            "/topic/" + userInfo?.id,
+            onMessageReceivedPrivate
         );
     };
 
