@@ -13,7 +13,7 @@ function HailingPopup({ stompClient }) {
         stompClient.send(
             "/app/broadcast.handleRequest",
             {},
-            JSON.stringify({ packageHailing, status: "decline" })
+            JSON.stringify({ ...packageHailing, status: "decline" })
         );
         dispatch(setMode("ready"));
     };
@@ -22,7 +22,7 @@ function HailingPopup({ stompClient }) {
         stompClient.send(
             "/app/broadcast.handleRequest",
             {},
-            JSON.stringify({ packageHailing, status: "accept" })
+            JSON.stringify({ ...packageHailing, status: "accept" })
         );
         dispatch(setMode("onFinish"));
     };

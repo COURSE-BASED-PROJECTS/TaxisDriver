@@ -39,7 +39,8 @@ function Login({ navigation }) {
                 })
                 .then(function (response) {
                     const userInfo = response.data;
-                    console.log(userInfo)
+                    console.log(userInfo);
+                    dispatch(setUserInfo(userInfo));
 
                     if (userInfo !== null && response.status === 200) {
                         axios
@@ -50,6 +51,11 @@ function Login({ navigation }) {
                                 // handle success
                                 if (driverInfo !== null && res.status === 200) {
                                     dispatch(setUserInfo(driverInfo));
+
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: "HomeStackScreen" }],
+                                    });
                                 }
                             })
                             .catch(function (error) {
@@ -59,12 +65,6 @@ function Login({ navigation }) {
                             .then(function () {
                                 // always executed
                             });
-                        dispatch(setUserInfo(userInfo));
-
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: "HomeStackScreen" }],
-                        });
                     }
                 })
                 .catch(function (error) {

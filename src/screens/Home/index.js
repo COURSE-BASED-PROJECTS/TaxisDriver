@@ -32,7 +32,7 @@ import {
 let stompClient = null;
 
 function Home() {
-    const [switchRidingMode, setSwitchRidingMode] = useState(false);
+    const [switchRidingMode, setSwitchRidingMode] = useState(true);
     const [intervalID, setIntervalID] = useState(null);
     const [position, setPosition] = useState({});
 

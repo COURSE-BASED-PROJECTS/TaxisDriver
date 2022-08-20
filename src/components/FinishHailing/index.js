@@ -16,9 +16,9 @@ function FinishHailing({ stompClient }) {
         stompClient.send(
             "/app/broadcast.handleRequest",
             {},
-            JSON.stringify({ packageHailing, status: "end" })
+            JSON.stringify({ ...packageHailing, status: "end" })
         );
-        dispatch(setPackageHailing({ packageHailing, status: "end" }));
+        dispatch(setPackageHailing({ ...packageHailing, status: "end" }));
         dispatch(setMode("ready"));
     };
 
