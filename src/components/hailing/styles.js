@@ -4,7 +4,7 @@ import Colors from "../../styles/Colors";
 const styles = StyleSheet.create({
     hailingPopup: {
         width: Dimensions.get("window").width * 0.9,
-        height: Dimensions.get("window").height * 0.47,
+        height: "auto",
         backgroundColor: Colors.bg_primary,
         position: "absolute",
         bottom: Dimensions.get("window").height * 0.03,
@@ -51,7 +51,8 @@ const styles = StyleSheet.create({
     },
     infoHailing: {
         padding: 16,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        flexShrink: 1
     },
     startToDestination: {
         display: 'flex',
@@ -79,14 +80,20 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         marginLeft: 15
     },
-    startInfo: {},
+    startInfo: {
+        flexShrink: 1,
+        maxWidth: "96%"
+    },
     separator: {
         width: Dimensions.get("window").width * 0.65,
         height: 2,
         backgroundColor: '#d5d5d5',
         marginVertical: 15
     },
-    destinationInfo: {},
+    destinationInfo: {
+        flexShrink: 1,
+        maxWidth: "96%"
+    },
     title:{
         color: '#cfcfcf',
         fontSize: 16
