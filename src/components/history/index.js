@@ -2,7 +2,7 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import Colors from "../../styles/Colors";
 import styles from "./styles";
 
-function History() {
+function History({ history }) {
     return (
         <View style={styles.historyPopup}>
             <View style={styles.infoHistory}>
@@ -20,12 +20,16 @@ function History() {
                 <View style={styles.infoContent}>
                     <View style={styles.startInfo}>
                         <Text style={styles.title}>Điểm đón</Text>
-                        <Text style={styles.content}>123 Nguyễn Văn Cừ</Text>
+                        <Text style={styles.content}>
+                            {history?.pickingAddress}
+                        </Text>
                     </View>
                     <View style={styles.separator}></View>
                     <View style={styles.destinationInfo}>
                         <Text style={styles.title}>Điểm đến</Text>
-                        <Text style={styles.content}>456 Nguyễn Văn Cừ</Text>
+                        <Text style={styles.content}>
+                            {history?.arrivingAddress}
+                        </Text>
                     </View>
                 </View>
             </View>
@@ -34,18 +38,21 @@ function History() {
                 <View style={styles.basicHistoryPopup}>
                     <Image
                         style={styles.ava}
-                        source={require("../../../assets/icons/ava.png")}
+                        source={require("../../../assets/icons/gamer.png")}
                     />
                     <View style={styles.historyPopupContent}>
-                        <Text style={styles.name}>Nguyễn Đức Huy</Text>
+                        <Text style={styles.name}>{history?.clientName}</Text>
                         <Text style={styles.pay}>Tiền mặt</Text>
                     </View>
                 </View>
                 <View style={styles.priceHistoryPopup}>
-                    <Text style={styles.price}>20,000đ</Text>
-                    <Text style={styles.time}>5 phút</Text>
+                    <Text style={styles.price}>
+                        {(history?.cost ?? 0)
+                            .toFixed(2)
+                            .replace(/\d(?=(\d{3})+\.)/g, "$&,") + "đ"}
+                    </Text>
+                    <Text style={styles.time}>{history?.timeDuring}</Text>
                 </View>
-
             </View>
         </View>
     );

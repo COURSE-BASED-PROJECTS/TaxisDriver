@@ -31,7 +31,7 @@ function Info() {
                 <View style={styles.basicInfo}>
                     <Image
                         style={styles.ava}
-                        source={require("../../../assets/icons/ava.png")}
+                        source={require("../../../assets/icons/gamer.png")}
                     />
                     <View style={styles.infoContent}>
                         <Text style={styles.name}>{userInfo?.name}</Text>

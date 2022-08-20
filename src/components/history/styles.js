@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     },
     priceHistoryPopup: {
         marginTop: 3,
+        maxWidth: "30%"
     },
     time: {
         fontWeight: "300",
@@ -92,7 +93,8 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     content:{
-        fontSize: 20
+        fontSize: 20,
+        maxWidth: "90%"
     },
     
 });

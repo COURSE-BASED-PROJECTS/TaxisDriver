@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         marginTop: 2
     },
     balanceInfo:{
-        marginTop: 5
+        marginTop: 5,
     },
     balanceTitle:{
         fontWeight: '300',

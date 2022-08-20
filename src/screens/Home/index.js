@@ -22,7 +22,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { setPackageHailing } from "../../store/reducer/statusPackageSlice";
 import { setMode } from "../../store/reducer/statusDriverMode";
-import { statusDriverModeSelector } from "../../store/selector";
+import {
+    statusDriverModeSelector,
+    accountSelector,
+} from "../../store/selector";
 
 let stompClient = null;
 
@@ -32,6 +35,7 @@ function Home() {
     const [position, setPosition] = useState({});
 
     const { mode } = useSelector(statusDriverModeSelector);
+    const { userInfo } = useSelector(accountSelector);
     const dispatch = useDispatch();
 
     const handleSwitch = () => {
@@ -78,7 +82,7 @@ function Home() {
                     stompClient.send(
                         "/app/gps.getGps",
                         {},
-                        packageGPS("1234", "45567", position, "GPS")
+                        packageGPS("1234", userInfo?.id, position, "GPS")
                     );
                 }
             }, configTime.sendingGPS);

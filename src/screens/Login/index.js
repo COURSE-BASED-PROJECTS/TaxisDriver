@@ -20,59 +20,60 @@ import {
 } from "../../store/reducer/accountSlice";
 
 import axios from "axios";
-import { loginAPI, driverInfo } from "../../service/api";
+import { loginAPI, driverInfoAPI } from "../../service/api";
 
 function Login({ navigation }) {
     const dispatch = useDispatch();
     const { username, password } = useSelector(accountSelector);
 
     const handleSubmit = async () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: "HomeStackScreen" }],
-        });
-        // if (username !== "" && password !== "") {
-        //     axios
-        //         .post(loginAPI, {
-        //             username,
-        //             password,
-        //         })
-        //         .then(function (response) {
-        //             const userInfo = response.data;
+        // navigation.reset({
+        //     index: 0,
+        //     routes: [{ name: "HomeStackScreen" }],
+        // });
+        if (username !== "" && password !== "") {
+            axios
+                .post(loginAPI, {
+                    username,
+                    password,
+                })
+                .then(function (response) {
+                    const userInfo = response.data;
+                    console.log(userInfo)
 
-        //             if (userInfo !== null && response.status === 200) {
-        //                 console.log(userInfo);
-        //                 axios
-        //                     .get(driverInfo + userInfo.phonenumber)
-        //                     .then(function (res) {
-        //                         const driverInfo = res.data;
-        //                         // handle success
-        //                         if (userInfo !== null && res.status === 200) {
-        //                             dispatch(setUserInfo(driverInfo));
-        //                         }
-        //                     })
-        //                     .catch(function (error) {
-        //                         // handle error
-        //                         console.log(error);
-        //                     })
-        //                     .then(function () {
-        //                         // always executed
-        //                     });
-        //                 dispatch(setUserInfo(userInfo));
+                    if (userInfo !== null && response.status === 200) {
+                        axios
+                            .get(driverInfoAPI + userInfo.phoneNumber)
+                            .then(function (res) {
+                                const driverInfo = res.data;
+                                console.log(driverInfo);
+                                // handle success
+                                if (driverInfo !== null && res.status === 200) {
+                                    dispatch(setUserInfo(driverInfo));
+                                }
+                            })
+                            .catch(function (error) {
+                                // handle error
+                                console.log(error);
+                            })
+                            .then(function () {
+                                // always executed
+                            });
+                        dispatch(setUserInfo(userInfo));
 
-        //                 navigation.reset({
-        //                     index: 0,
-        //                     routes: [{ name: "HomeStackScreen" }],
-        //                 });
-        //             }
-        //         })
-        //         .catch(function (error) {
-        //             alert("Tên tài khoản hoặc mật khẩu sai");
-        //             dispatch(setUsername(""));
-        //             dispatch(setPassword(""));
-        //             console.log(error);
-        //         });
-        // }
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: "HomeStackScreen" }],
+                        });
+                    }
+                })
+                .catch(function (error) {
+                    alert("Tên tài khoản hoặc mật khẩu sai");
+                    dispatch(setUsername(""));
+                    dispatch(setPassword(""));
+                    console.log(error);
+                });
+        }
     };
 
     return (

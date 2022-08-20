@@ -28,7 +28,7 @@ function FinishHailing({ stompClient }) {
                 <View style={styles.basicHailingPopup}>
                     <Image
                         style={styles.ava}
-                        source={require("../../../assets/icons/ava.png")}
+                        source={require("../../../assets/icons/gamer.png")}
                     />
                     <View style={styles.hailingPopupContent}>
                         <Text style={styles.name}>

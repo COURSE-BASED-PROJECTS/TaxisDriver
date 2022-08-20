@@ -61,7 +61,7 @@ function User({ navigation }) {
                             {userInfo?.plate ?? "XX-XXXX"}
                         </Text>
                         <Text style={styles.nameCar}>
-                            {userInfo?.carType ?? "S450 Mercedes"}
+                            {userInfo?.carName ?? "S450 Mercedes"}
                         </Text>
                     </View>
                 </View>
