@@ -27,53 +27,58 @@ function Login({ navigation }) {
     const { username, password } = useSelector(accountSelector);
 
     const handleSubmit = async () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: "HomeStackScreen" }],
-        });
-        // if (username !== "" && password !== "") {
-        //     axios
-        //         .post(loginAPI, {
-        //             username,
-        //             password,
-        //         })
-        //         .then(function (response) {
-        //             const userInfo = response.data;
-        //             console.log(userInfo);
-        //             dispatch(setUserInfo(userInfo));
+        // navigation.reset({
+        //     index: 0,
+        //     routes: [{ name: "HomeStackScreen" }],
+        // });
+        if (username !== "" && password !== "") {
+            axios
+                .post(loginAPI, {
+                    username,
+                    password,
+                })
+                .then(function (response) {
+                    const userInfo = response.data;
+                    console.log(userInfo);
+                    dispatch(setUserInfo(userInfo));
 
-        //             if (userInfo !== null && response.status === 200) {
-        //                 axios
-        //                     .get(driverInfoAPI + userInfo.phoneNumber)
-        //                     .then(function (res) {
-        //                         const driverInfo = res.data;
-        //                         console.log(driverInfo);
-        //                         // handle success
-        //                         if (driverInfo !== null && res.status === 200) {
-        //                             dispatch(setUserInfo(driverInfo));
+                    if (userInfo !== null && response.status === 200) {
+                        axios
+                            .get(driverInfoAPI + userInfo.phoneNumber)
+                            .then(function (res) {
+                                const driverInfo = res.data;
+                                console.log(driverInfo);
+                                // handle success
+                                if (driverInfo !== null && res.status === 200) {
+                                    dispatch(setUserInfo(driverInfo));
 
-        //                             navigation.reset({
-        //                                 index: 0,
-        //                                 routes: [{ name: "HomeStackScreen" }],
-        //                             });
-        //                         }
-        //                     })
-        //                     .catch(function (error) {
-        //                         // handle error
-        //                         console.log(error);
-        //                     })
-        //                     .then(function () {
-        //                         // always executed
-        //                     });
-        //             }
-        //         })
-        //         .catch(function (error) {
-        //             alert("Tên tài khoản hoặc mật khẩu sai");
-        //             dispatch(setUsername(""));
-        //             dispatch(setPassword(""));
-        //             console.log(error);
-        //         });
-        // }
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: "HomeStackScreen" }],
+                                    });
+                                }
+                            })
+                            .catch(function (error) {
+                                // handle error
+                                console.log(error);
+                                alert("Đăng nhập thất bại")
+                            })
+                            .then(function () {
+                                // always executed
+                            });
+                    }
+                })
+                .catch(function (error) {
+                    alert("Tên tài khoản hoặc mật khẩu sai");
+                    dispatch(setUsername(""));
+                    dispatch(setPassword(""));
+                    console.log(error);
+                });
+        }
+    };
+
+    const moveToRegister = () => {
+        navigation.navigate("Register");
     };
 
     return (
@@ -111,6 +116,13 @@ function Login({ navigation }) {
                     onPress={handleSubmit}
                 >
                     <Text style={styles.buttonTitle}>Đăng nhập</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.buttonContainer}
+                    onPress={moveToRegister}
+                >
+                    <Text style={styles.buttonTitle}>Đăng ký</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

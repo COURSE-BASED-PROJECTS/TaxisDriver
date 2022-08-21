@@ -9,9 +9,12 @@ const styles = StyleSheet.create({
     button: {
         flex: 1,
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "space-evenly",
         alignItems: "center",
         marginVertical: 40,
+
+        flexDirection: "row",
+
     },
     imgBackground: {
         flex: 8,
