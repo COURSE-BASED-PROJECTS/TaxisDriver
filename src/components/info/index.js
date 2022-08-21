@@ -4,6 +4,8 @@ import styles from "./styles";
 import { accountSelector } from "../../store/selector";
 import { useSelector } from "react-redux";
 
+import NumberFormat from "react-number-format";
+
 const ratingHistory = [
     {
         image: require("../../../assets/icons/check-mark.png"),
@@ -47,9 +49,12 @@ function Info() {
                 <View style={styles.balanceInfo}>
                     <Text style={styles.balanceTitle}>Thu nhập</Text>
                     <Text style={styles.balance}>
-                        {(userInfo?.balance ?? 0)
-                            .toFixed(2)
-                            .replace(/\d(?=(\d{3})+\.)/g, "$&,") + "đ"}
+                        <NumberFormat
+                            value={Math.round(userInfo?.balance ?? 0)}
+                            displayType="text"
+                            thousandSeparator
+                            renderText={(value) => <Text>{value + "đ"}</Text>}
+                        />
                     </Text>
                 </View>
             </View>

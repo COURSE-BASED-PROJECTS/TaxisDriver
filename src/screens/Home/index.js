@@ -22,6 +22,7 @@ import { packageGPS } from "../../utils/packageSend";
 
 import { useDispatch, useSelector } from "react-redux";
 
+import { setUserInfo } from "../../store/reducer/accountSlice";
 import { setPackageHailing } from "../../store/reducer/statusPackageSlice";
 import { setMode } from "../../store/reducer/statusDriverMode";
 import {
@@ -29,16 +30,45 @@ import {
     accountSelector,
 } from "../../store/selector";
 
+import { driverInfoAPI } from "../../service/api";
+
+import { useIsFocused } from "@react-navigation/core";
+
+import axios from "axios";
+
 let stompClient = null;
 
 function Home() {
-    const [switchRidingMode, setSwitchRidingMode] = useState(true);
+    const [switchRidingMode, setSwitchRidingMode] = useState(false);
     const [intervalID, setIntervalID] = useState(null);
     const [position, setPosition] = useState({});
 
     const { mode } = useSelector(statusDriverModeSelector);
     const { userInfo } = useSelector(accountSelector);
     const dispatch = useDispatch();
+
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        if (isFocused) {
+            axios
+                .get(driverInfoAPI + userInfo?.phoneNumber)
+                .then(function (res) {
+                    const driverInfo = res.data;
+                    // handle success
+                    if (driverInfo !== null && res.status === 200) {
+                        dispatch(setUserInfo(driverInfo));
+                    }
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+                .then(function () {
+                    // always executed
+                });
+        }
+    }, [isFocused]);
 
     const handleSwitch = () => {
         setSwitchRidingMode((state) => !state);
@@ -61,37 +91,43 @@ function Home() {
             setPosition(pos);
         };
 
-        setIntervalID(getLocation, configTime.getGPS);
+        getLocation();
+
+        setInterval(getLocation, configTime.getGPS);
     }, []);
 
     useEffect(() => {
-        const socket = new SockJS(socketServer);
-        stompClient = Stomp.over(socket);
+        if (switchRidingMode === true) {
+            const socket = new SockJS(socketServer);
+            stompClient = Stomp.over(socket);
 
-        stompClient.connect({}, onConnected, onError);
+            stompClient.connect({}, onConnected, onError);
+        }
 
-        return () => stompClient && stompClient.disconnect();
-    }, []);
+        return () => {
+            stompClient?.disconnect();
+            stompClient = null;
+        };
+    }, [switchRidingMode]);
 
     useEffect(() => {
         if (intervalID) clearInterval(intervalID);
 
         if (switchRidingMode === true) {
-            const id = setInterval(() => {
-                // Tell your username to the server
-
-                if (position?.latitude && position?.longitude) {
-                    stompClient.send(
-                        "/app/gps.getGps",
-                        {},
-                        packageGPS("1234", userInfo?.id, position, "GPS")
-                    );
-                }
-            }, configTime.sendingGPS);
-
+            const id = setInterval(sendGPSPackage, configTime.sendingGPS);
             setIntervalID(id);
         }
     }, [switchRidingMode]);
+
+    const sendGPSPackage = () => {
+        if (position?.latitude && position?.longitude) {
+            stompClient.send(
+                "/app/gps.getGps",
+                {},
+                packageGPS("1234", userInfo?.id, position, "GPS")
+            );
+        }
+    };
 
     const onConnected = () => {
         console.log("onConnected");
@@ -101,6 +137,7 @@ function Home() {
             "/topic/" + userInfo?.id,
             onMessageReceivedPrivate
         );
+        sendGPSPackage();
     };
 
     const onError = (error) => {
@@ -112,14 +149,15 @@ function Home() {
 
         if (message.status === "waiting") {
             if (!switchRidingMode) {
+                // console.log(switchRidingMode);
                 stompClient.send(
                     "/app/broadcast.handleRequest",
                     {},
                     JSON.stringify({ ...message, status: "decline" })
                 );
                 return;
-            }
-            if (mode === "ready") {
+            } else if (mode === "ready") {
+                console.log("ready");
                 dispatch(setPackageHailing(message));
                 dispatch(setMode("option"));
             } else {

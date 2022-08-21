@@ -16,7 +16,7 @@ import { accountSelector } from "../../store/selector";
 import { useSelector, useDispatch } from "react-redux";
 import { setRegisterInfo } from "../../store/reducer/accountSlice";
 
-import { registerAPI } from "../../service/api";
+import { registerAPI, taxiAPI, driverAPI } from "../../service/api";
 
 import axios from "axios";
 
@@ -32,7 +32,11 @@ function RegisterScreen({ navigation }) {
             registerInfo.phoneNumber &&
             registerInfo.password &&
             registerInfo.name &&
-            registerInfo.address
+            registerInfo.address &&
+            registerInfo.taxiName &&
+            registerInfo.plate &&
+            registerInfo.carType &&
+            registerInfo.identification
         ) {
             axios
                 .post(registerAPI, {
@@ -46,13 +50,54 @@ function RegisterScreen({ navigation }) {
                     console.log(response.data);
 
                     if (response.status === 200) {
-                        dispatch(setRegisterInfo({}));
+                        axios
+                            .post(taxiAPI, {
+                                taxiName: registerInfo?.taxiName,
+                                plate: registerInfo?.plate,
+                                carType: registerInfo?.carType,
+                            })
+                            .then(function (resTaxi) {
+                                if (resTaxi.status === 200) {
+                                    console.log(resTaxi.data);
 
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: "Login" }],
-                        });
-                    } 
+                                    axios
+                                        .post(driverAPI, {
+                                            driverName: registerInfo?.name,
+                                            identification:
+                                                registerInfo?.identification,
+                                            phoneNumber:
+                                                registerInfo?.phoneNumber,
+                                            balance: 0,
+                                            ride_count: 0,
+                                            taxi_id: resTaxi.data.taxiId,
+                                        })
+                                        .then(function (resDriver) {
+                                            if (resDriver.status === 200) {
+                                                console.log(resDriver.data);
+                                                navigation.reset({
+                                                    index: 0,
+                                                    routes: [{ name: "Login" }],
+                                                });
+                                            }
+                                        })
+                                        .catch(function (error) {
+                                            console.log(error);
+                                            alert("Đăng ký không thành công");
+                                        });
+                                }
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                                alert("Đăng ký không thành công");
+                            });
+
+                        // dispatch(setRegisterInfo({}));
+
+                        // navigation.reset({
+                        //     index: 0,
+                        //     routes: [{ name: "Login" }],
+                        // });
+                    }
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -117,6 +162,34 @@ function RegisterScreen({ navigation }) {
                         placeholder={"Nhập địa chỉ nhà"}
                         type="register"
                         register="address"
+                    />
+
+                    <FormElement
+                        title={"Tên xe"}
+                        placeholder={"Nhập tên xe"}
+                        type="register"
+                        register="taxiName"
+                    />
+
+                    <FormElement
+                        title={"Biển số xe"}
+                        placeholder={"Nhập biển số xe"}
+                        type="register"
+                        register="plate"
+                    />
+
+                    <FormElement
+                        title={"Loại xe"}
+                        placeholder={"Nhập loại xe"}
+                        type="register"
+                        register="carType"
+                    />
+
+                    <FormElement
+                        title={"CMND"}
+                        placeholder={"Nhập CMND"}
+                        type="register"
+                        register="identification"
                     />
                 </ScrollView>
             </KeyboardAvoidingView>

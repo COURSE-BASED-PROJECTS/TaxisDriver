@@ -1,7 +1,7 @@
 // config time by ms
 
 const configTime = {
-    sendingGPS: 2000,
+    sendingGPS: 5000,
     getGPS: 5000,
 };
 

@@ -12,9 +12,39 @@ import {
 import { setPackageHailing } from "../../store/reducer/statusPackageSlice";
 import { setMode } from "../../store/reducer/statusDriverMode";
 import { useSelector, useDispatch } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
+
+import { driverInfoAPI } from "../../service/api";
+
+import NumberFormat from "react-number-format";
+import { useEffect } from "react";
+
+import axios from "axios";
 
 function User({ navigation }) {
     const { userInfo } = useSelector(accountSelector);
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        if (isFocused) {
+            axios
+                .get(driverInfoAPI + userInfo?.phoneNumber)
+                .then(function (res) {
+                    const driverInfo = res.data;
+                    // handle success
+                    if (driverInfo !== null && res.status === 200) {
+                        dispatch(setUserInfo(driverInfo));
+                    }
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+                .then(function () {
+                    // always executed
+                });
+        }
+    }, [isFocused]);
 
     const dispatch = useDispatch();
 
@@ -92,9 +122,12 @@ function User({ navigation }) {
                 </TouchableOpacity>
                 <Text style={styles.incomeTitle}>Số dư tài khoản</Text>
                 <Text style={styles.incomeContent}>
-                    {(userInfo?.balance ?? 0)
-                        .toFixed(2)
-                        .replace(/\d(?=(\d{3})+\.)/g, "$&,") + "đ"}
+                    <NumberFormat
+                        value={Math.round(userInfo?.balance ?? 0)}
+                        displayType="text"
+                        thousandSeparator
+                        renderText={(value) => <Text>{value + "đ"}</Text>}
+                    />
                 </Text>
             </View>
         </SafeAreaView>

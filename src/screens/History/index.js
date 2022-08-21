@@ -10,32 +10,37 @@ import { useSelector } from "react-redux";
 import { historyAPI } from "../../service/api";
 import axios from "axios";
 
-const fakeData = [{ history: 1 }, { history: 1 }, { history: 1 }];
+import { useIsFocused } from "@react-navigation/core";
+
+// const fakeData = [{ history: 1 }, { history: 1 }, { history: 1 }];
 
 function History() {
     const [histories, setHistories] = useState([]);
     const { userInfo } = useSelector(accountSelector);
-    
+    const isFocused = useIsFocused();
+    console.log(" history render");
 
     useEffect(() => {
-        if (userInfo?.id === "" || userInfo?.id === undefined) return;
-        else {
-            console.log(historyAPI + userInfo?.id);
-            axios
-                .get(historyAPI + userInfo?.id)
-                .then(function (response) {
-                    if (response.status === 200) {
-                        setHistories(response.data);
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                })
-                .then(function () {
-                    // always executed
-                });
+        if (isFocused) {
+            if (userInfo?.id === "" || userInfo?.id === undefined) return;
+            else {
+                console.log(historyAPI + userInfo?.id);
+                axios
+                    .get(historyAPI + userInfo?.id)
+                    .then(function (response) {
+                        if (response.status === 200) {
+                            setHistories(response.data);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .then(function () {
+                        // always executed
+                    });
+            }
         }
-    }, []);
+    }, [isFocused]);
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Chuyến xe</Text>

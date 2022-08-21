@@ -7,6 +7,8 @@ import { setMode } from "../../store/reducer/statusDriverMode";
 import { useDispatch, useSelector } from "react-redux";
 import { statusPackageSelector } from "../../store/selector";
 
+import NumberFormat from "react-number-format";
+
 function FinishHailing({ stompClient }) {
     const dispatch = useDispatch();
 
@@ -39,12 +41,19 @@ function FinishHailing({ stompClient }) {
                 </View>
                 <View style={styles.priceHailingPopup}>
                     <Text style={styles.price}>
-                        {" "}
-                        {packageHailing?.hailing?.cost}đ
+                        <NumberFormat
+                            value={Math.round(
+                                packageHailing?.hailing?.cost ?? 0
+                            )}
+                            displayType="text"
+                            thousandSeparator
+                            renderText={(value) => <Text>{value + "đ"}</Text>}
+                        />
                     </Text>
                     <Text style={styles.direction}>
-                        {Math.round(packageHailing?.hailing?.distance * 100) /
-                            100}
+                        {Math.round(
+                            (packageHailing?.hailing?.distance / 1000) * 100
+                        ) / 100}
                         km
                     </Text>
                 </View>
